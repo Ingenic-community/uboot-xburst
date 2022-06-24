@@ -1,0 +1,13 @@
+property:
+    disk_size = 1024m
+    gpt_header_lba = 512
+    custom_signature = 0
+
+partition:
+	#name     =  start,   size, fstype
+	xboot      =    17k,  3055k,  EMPTY
+	boot      =     3m,     9m,     EMPTY
+	system    =    12m,   384m,     LINUX_FS
+	data      =   396m,   256m,     FAT_FS
+
+#fstype could be: LINUX_FS, FAT_FS, EMPTY
