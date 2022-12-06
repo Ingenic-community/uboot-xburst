@@ -1,14 +1,17 @@
 /*
- * Ingenic mensa configuration
+ * X1000 Nano configuration
  *
  * Copyright (c) 2013 Ingenic Semiconductor Co.,Ltd
  * Author: Zoro <ykli@ingenic.cn>
  * Based on: include/configs/urboard.h
  *           Written by Paul Burton <paul.burton@imgtec.com>
  *
+ * Copyright (c) 2022 SudoMaker
+ * Author: Reimu NotMoe <reimu@sudomaker.com>
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
- * published by the Free Software Foundation; either version 2 of
+ * published by the Free Software Foundation; either version 3 of
  * the License, or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
@@ -22,8 +25,8 @@
  * MA 02111-1307 USA
  */
 
-#ifndef __CONFIG_CU1000_NEO_H__
-#define __CONFIG_CU1000_NEO_H__
+#ifndef __CONFIG_X1000_NANO_EVB_NAND_H__
+#define __CONFIG_X1000_NANO_EVB_NAND_H__
 
 /**
  * Basic configuration(SOC, Cache, UART, DDR).
@@ -33,11 +36,11 @@
 #define CONFIG_SYS_LITTLE_ENDIAN
 #define CONFIG_X1000
 
-#define CONFIG_SYS_APLL_FREQ		1008000000	/*If APLL not use mast be set 0*/
+#define CONFIG_SYS_APLL_FREQ		1200000000	/*If APLL not use mast be set 0*/
 #define CONFIG_SYS_MPLL_FREQ		600000000	/*If MPLL not use mast be set 0*/
 #define CONFIG_CPU_SEL_PLL			APLL
 #define CONFIG_DDR_SEL_PLL			MPLL
-#define CONFIG_SYS_CPU_FREQ			1008000000
+#define CONFIG_SYS_CPU_FREQ			CONFIG_SYS_APLL_FREQ
 #define CONFIG_SYS_MEM_FREQ			200000000
 
 #define CONFIG_SYS_EXTAL			24000000	/* EXTAL freq: 24 MHz */
@@ -69,20 +72,9 @@
 
 #define CONFIG_MDDR_JSD12164PAI_KGD	/*DDR 64M param file*/
 
-/*pmu slp pin*/
-#define CONFIG_REGULATOR
-#ifdef  CONFIG_REGULATOR
-	#define CONFIG_JZ_PMU_SLP_OUTPUT1
-	#define CONFIG_INGENIC_SOFT_I2C
-	#define CONFIG_PMU_EA3056
-	#define CONFIG_EA3056_I2C_SCL	GPIO_PC(26)
-	#define CONFIG_EA3056_I2C_SDA	GPIO_PC(27)
-	#define CONFIG_SOFT_I2C_READ_REPEATED_START
-#endif
-
-#ifdef CONFIG_SPL_SFC_NOR
-	#define CONFIG_SPL_SFC_SUPPORT
-	#define CONFIG_SPL_VERSION	1
+#if defined(CONFIG_SPL_SFC_NOR) || defined(CONFIG_SPL_SFC_NAND)
+#define CONFIG_SPL_SFC_SUPPORT
+#define CONFIG_SPL_VERSION	1
 #endif
 
 /**
@@ -90,45 +82,15 @@
  */
 #define CONFIG_DDR_64M      64	    /*DDR size 64M*/
 
-#define BOOTARGS_COMMON "console=ttyS2,115200n8 mem=64M@0x0 loglevel=7 "
-#ifdef CONFIG_SPL_SFC_SUPPORT
+#define CONFIG_BOOTARGS		"console=ttyS2,115200n8 init=/linuxrc mem=64M@0x0 loglevel=7 ip=off root=/dev/mtdblock2 rw no_hash_pointers no_console_suspend devtmpfs.mount=1"
+
+#if defined(CONFIG_SPL_SFC_SUPPORT)
 	#if defined(CONFIG_SPL_SFC_NOR)
-		#define	 CONFIG_BOOTARGS BOOTARGS_COMMON "ip=off init=/linuxrc rootfstype=jffs2 root=/dev/mtdblock2 rw"
-		#define CONFIG_BOOTCOMMAND "sfcnor read 0x40000 0x300000 0x80800000 ;bootm 0x80800000"
-	#endif
-#elif defined(CONFIG_SPL_JZMMC_SUPPORT)
-	#ifdef CONFIG_JZ_MMC_MSC0
-		#define CONFIG_BOOTARGS BOOTARGS_COMMON " root=/dev/mmcblk0p2 rootfstype=ext4 rootdelay=1 rw"
-		#define CONFIG_BOOTCOMMAND "mmc dev 0;mmc read 0x80600000 0x1800 0x3000; bootm 0x80600000"
+		#define CONFIG_BOOTCOMMAND "sfcnor read 0x40000 0x800000 0x82000000; bootm 0x82000000"
+	#else  /* CONFIG_SPL_SFC_NAND */
+		#define CONFIG_BOOTCOMMAND "sfcnand read 0x40000 0x800000 0x82000000; bootm 0x82000000"
 	#endif
 #endif
-
-#ifdef CONFIG_SPL_OS_BOOT
-    #ifdef CONFIG_SPL_SFC_NOR
-	     #define CONFIG_SPL_BOOTARGS			BOOTARGS_COMMON "ip=off init=/linuxrc rootfstype=jffs2 root=/dev/mtdblock2 rw"
-    #endif
-	#ifdef CONFIG_OTA_VERSION20
-		#define CONFIG_PAR_NV_NAME				"NV_RW"
-		#undef CONFIG_SPL_BOOTARGS
-		#ifdef CONFIG_SPL_SFC_NOR
-			#define CONFIG_PAT_USERFS_NAME		"userfs"
-			#define CONFIG_PAT_UPDATEFS_NAME	"updatefs"
-			#define CONFIG_SPL_BOOTARGS         BOOTARGS_COMMON "ip=off init=/linuxrc rootfstype=cramfs root=/dev/mtdblock5 rw"
-		#endif
-	#else
-		#define CONFIG_SOFT_BURNER
-		#define CONFIG_AUDIO_CAL_DIV
-		#define CONFIG_AUDIO_APLL CONFIG_SYS_APLL_FREQ
-		#define CONFIG_AUDIO_MPLL CONFIG_SYS_MPLL_FREQ
-	#endif /*CONFIG_OTA_VERSION20*/
-
-	#define CONFIG_SPL_OS_NAME        		"kernel" /* spi offset of xImage being loaded */
-	#define CONFIG_SYS_SPL_ARGS_ADDR    	CONFIG_SPL_BOOTARGS
-	#define CONFIG_SYS_SPL_OTA_ARGS_ADDR	CONFIG_SPL_OTA_BOOTARGS
-	#define CONFIG_BOOTX_BOOTARGS       	BOOTARGS_COMMON "ip=off init=/linuxrc rootfstype=cramfs root=/dev/mtdblock6 rw"
-	#undef  CONFIG_BOOTCOMMAND
-	#define CONFIG_BOOTCOMMAND    			"bootx sfc 0x80f00000"
-#endif	/* CONFIG_SPL_OS_BOOT */
 
 #define PARTITION_NUM 10
 
@@ -158,8 +120,6 @@
 #define CONFIG_CMD_BOOTD		/* bootd			*/
 #define CONFIG_CMD_CONSOLE		/* coninfo			*/
 #define CONFIG_CMD_ECHO			/* echo arguments		*/
-#define CONFIG_CMD_EXT4 		/* ext4 support			*/
-#define CONFIG_CMD_FAT			/* FAT support			*/
 #define CONFIG_CMD_MEMORY		/* md mm nm mw cp cmp crc base loop mtest */
 #define CONFIG_CMD_MISC			/* Misc functions like sleep etc*/
 #define CONFIG_CMD_RUN			/* run command in env variable	*/
@@ -167,40 +127,11 @@
 #define CONFIG_CMD_SETGETDCR	/* DCR support on 4xx		*/
 #define CONFIG_CMD_SOURCE		/* "source" command support	*/
 #define CONFIG_CMD_GETTIME
-#define CONFIG_CMD_UNZIP        /* unzip from memory to memory  */
-#define CONFIG_CMD_DHCP
-#define CONFIG_CMD_NET			/* networking support*/
-#define CONFIG_CMD_PING
 
 #ifndef CONFIG_SPL_BUILD
 	#define CONFIG_USE_ARCH_MEMSET
 	#define CONFIG_USE_ARCH_MEMCPY
 #endif
-
-/* DEBUG ETHERNET */
-#define CONFIG_SERVERIP     192.168.4.13
-#define CONFIG_IPADDR       192.168.4.90
-#define CONFIG_GATEWAYIP    192.168.4.1
-#define CONFIG_NETMASK      255.255.255.0
-#define CONFIG_ETHADDR      00:11:22:33:44:55
-
-#define GMAC_PHY_MII		1
-#define GMAC_PHY_RMII		2
-#define GMAC_PHY_GMII		3
-#define GMAC_PHY_RGMII		4
-#define CONFIG_NET_GMAC_PHY_MODE GMAC_PHY_RMII
-
-#define PHY_TYPE_DM9161		1
-#define PHY_TYPE_88E1111	2
-#define CONFIG_NET_PHY_TYPE	PHY_TYPE_DM9161
-
-#define CONFIG_NET_GMAC
-#define CONFIG_GPIO_DM9161_RESET			GPIO_PB(3)
-#define CONFIG_GPIO_DM9161_RESET_ENLEVEL	0
-#define CONFIG_GMAC_CRLT_PORT				GPIO_PORT_B
-#define CONFIG_GMAC_CRLT_PORT_PINS			(0x7 << 7)
-#define CONFIG_GMAC_CRTL_PORT_INIT_FUNC		GPIO_FUNC_1
-#define CONFIG_GMAC_CRTL_PORT_SET_FUNC		GPIO_OUTPUT0
 
 /* MMC */
 #define CONFIG_CMD_MMC
@@ -211,8 +142,8 @@
 
 	#ifdef CONFIG_JZ_MMC_MSC0
 		#define CONFIG_JZ_MMC_SPLMSC		0
-		#define CONFIG_JZ_MMC_MSC0_PA_8BIT	1
-		#define CONFIG_MSC_DATA_WIDTH_8BIT
+		#define CONFIG_JZ_MMC_MSC0_PA_4BIT	1
+		#define CONFIG_MSC_DATA_WIDTH_4BIT
 	#endif
 #endif
 
@@ -224,11 +155,9 @@
 /**
  * Miscellaneous configurable options
  */
-#define CONFIG_DOS_PARTITION
 
-#define CONFIG_LZMA
 #define CONFIG_LZO
-#define CONFIG_RBTREE
+#define CONFIG_LZMA
 
 #define CONFIG_SKIP_LOWLEVEL_INIT
 #define CONFIG_BOARD_EARLY_INIT_F
@@ -245,11 +174,19 @@
 #if defined(CONFIG_SPL_JZMMC_SUPPORT)
 	#if	defined(CONFIG_JZ_MMC_MSC0)
 		#define CONFIG_SYS_PROMPT CONFIG_SYS_BOARD "-msc0# "
+	#else
+		#define CONFIG_SYS_PROMPT CONFIG_SYS_BOARD "-msc1# "
 	#endif
+#elif defined(CONFIG_SPL_NOR_SUPPORT)
+	#define CONFIG_SYS_PROMPT CONFIG_SYS_BOARD "-nor# "
 #elif defined(CONFIG_SPL_SFC_SUPPORT)
 	#if defined(CONFIG_SPL_SFC_NOR)
 		#define CONFIG_SYS_PROMPT CONFIG_SYS_BOARD "-sfcnor# "
+	#else  /* CONFIG_SPL_SFC_NAND */
+		#define CONFIG_SYS_PROMPT CONFIG_SYS_BOARD "-sfcnand# "
 	#endif
+#elif defined(CONFIG_SPL_SPI_NAND)
+	#define CONFIG_SYS_PROMPT CONFIG_SYS_BOARD "-spinand# "
 #endif
 
 #define CONFIG_SYS_CBSIZE 1024 /* Console I/O Buffer Size */
@@ -300,10 +237,6 @@
 #define CONFIG_SPL_SERIAL_SUPPORT
 #define CONFIG_SPL_GPIO_SUPPORT
 #define CONFIG_SPL_BOARD_INIT
-#define CONFIG_SPL_I2C_SUPPORT
-#define CONFIG_SPL_REGULATOR_SUPPORT
-#define CONFIG_SPL_CORE_VOLTAGE			1350
-#define CONFIG_SPL_CORE_VOLTAGE_RATIO	2
 #define CONFIG_SPL_LIBGENERIC_SUPPORT
 #if defined(CONFIG_SPL_JZMMC_SUPPORT)
 	#define CONFIG_SPL_PAD_TO			12288		/* spl size */
@@ -316,17 +249,16 @@
 	#define CONFIG_SPL_TEXT_BASE		0xf4001000
 	#define CONFIG_SPL_MAX_SIZE			(12 * 1024)
 	#define CONFIG_SPL_PAD_TO			16384
-	#define CONFIG_CMD_SFC_NOR
-#endif
 
-#ifdef CONFIG_CMD_SFC_NOR
 	#define CONFIG_JZ_SFC
-	#define CONFIG_JZ_SFC_NOR
 	#define CONFIG_SFC_QUAD
-	#define CONFIG_SFC_NOR_RATE			150000000
+	#define CONFIG_SFC_NOR_RATE			133000000
 #endif
 
-#ifdef CONFIG_JZ_SFC_NOR
+#ifdef CONFIG_SPL_SFC_NOR
+	#define CONFIG_JZ_SFC_NOR
+	#define CONFIG_CMD_SFC_NOR
+
 	#define CONFIG_SPIFLASH_PART_OFFSET			0x3c00
 	#define CONFIG_SPI_NORFLASH_PART_OFFSET     0x3c74
 	#define CONFIG_NOR_MAJOR_VERSION_NUMBER     1
@@ -340,4 +272,4 @@
  */
 #define CONFIG_GPT_TABLE_PATH	"$(TOPDIR)/board/$(BOARDDIR)"
 
-#endif /* __CONFIG_CU1000_NEO_H__ */
+#endif /* __CONFIG_X1000_NANO_EVB_NAND_H__ */

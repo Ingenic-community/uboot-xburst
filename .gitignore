@@ -98,3 +98,9 @@ GTAGS
 
 # spl ais files
 /spl/*.ais
+
+#
+# Internal projects
+#
+/include/configs/sudomaker-internal-*
+/board/ingenic/sudomaker-internal-*

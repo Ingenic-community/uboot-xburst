@@ -85,7 +85,7 @@
 #define CONFIG_DDR_64M      64	    /*DDR size 64M*/
 
 
-#define CONFIG_BOOTARGS		"console=ttyS2,115200n8 mem=64M@0x0 loglevel=7 ip=off rootfstype=jffs2 root=/dev/mtdblock2 rw no_hash_pointers no_console_suspend devtmpfs.mount=1"
+#define CONFIG_BOOTARGS		"console=ttyS2,115200n8 mem=64M@0x0 loglevel=7 ip=off rootfstype=jffs2 root=/dev/mtdblock2 rw no_hash_pointers no_console_suspend devtmpfs.mount=1 ingenic_pm_clk=0"
 
 #define CONFIG_BOOTCOMMAND	"sfcnor read 0x40000 0x800000 0x82000000; bootm 0x82000000"
 
@@ -156,10 +156,8 @@
 /**
  * Miscellaneous configurable options
  */
-#define CONFIG_DOS_PARTITION
-
 #define CONFIG_LZO
-#define CONFIG_RBTREE
+#define CONFIG_LZMA
 
 #define CONFIG_SKIP_LOWLEVEL_INIT
 #define CONFIG_BOARD_EARLY_INIT_F

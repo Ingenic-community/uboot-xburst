@@ -1,3 +1,5 @@
+/* Modified by: Reimu NotMoe <reimu@sudomaker.com> */
+
 #include <stdio.h>
 #include <config.h>
 
@@ -26,7 +28,13 @@
 #define M(x) (x * 1000 * 1000)
 #define MAX_H0_CLK M(200)
 #define MAX_H2_CLK M(200)
+
+/* Stock PCLK frequency is 150MHz */
 #define MAX_P_CLK  M(150)
+
+/* Improve GPIO toggling speed and overclock MCU to 200MHz, use with caution. Needs make mrproper to take effect. */
+/*#define MAX_P_CLK  M(200)*/
+
 #define MAX_L2_CLK M(600)
 
 struct pll_setting
@@ -37,6 +45,7 @@ struct pll_setting
 	unsigned int cpu_sel_pll;
 	unsigned int ddr_sel_pll;
 };
+
 struct div_setting
 {
 	int cdiv;

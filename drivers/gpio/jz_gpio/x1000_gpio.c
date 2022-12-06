@@ -29,9 +29,9 @@ static struct jz_gpio_func_def uart_gpio_func[] = {
 	[1] = { .port = GPIO_PORT_D, .func = GPIO_FUNC_1, .pins = 0xf<<2},
 #endif
 #ifdef CONFIG_SYS_UART2_PD
-	[2] = { .port = GPIO_PORT_D, .func = GPIO_FUNC_0, .pins = 3<<4},
+	[2] = { .port = GPIO_PORT_D, .func = GPIO_FUNC_0 | GPIO_PULL, .pins = 3<<4},
 #elif defined(CONFIG_SYS_UART2_PA)
-	[2] = { .port = GPIO_PORT_A, .func = GPIO_FUNC_2, .pins = 3<<2},
+	[2] = { .port = GPIO_PORT_A, .func = GPIO_FUNC_2 | GPIO_PULL, .pins = 3<<2},
 #else
 	[2] = { .port = GPIO_PORT_C, .func = GPIO_FUNC_1 | GPIO_PULL, .pins = 1<<31},
 #endif

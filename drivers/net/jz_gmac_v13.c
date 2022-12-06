@@ -411,14 +411,14 @@ static int jz_init(struct eth_device* dev, bd_t * bd)
 	gmacdev->ClockDivMdc = synopGMAC_get_mdc_clk_div(gmacdev);
 
 	/* search phy */
-	phy_id = synopGMAC_search_phy(gmacdev);
-	if (phy_id >= 0) {
-		printf("====>found PHY %d\n", phy_id);
-		gmacdev->PhyBase = phy_id;
-	} else {
-		printf("====>PHY not found!\n");
-	}
-	synopGMAC_check_phy_init(gmacdev);
+	// phy_id = synopGMAC_search_phy(gmacdev);
+	// if (phy_id >= 0) {
+	// 	printf("====>found PHY %d\n", phy_id);
+	// 	gmacdev->PhyBase = phy_id;
+	// } else {
+	// 	printf("====>PHY not found!\n");
+	// }
+	// synopGMAC_check_phy_init(gmacdev);
 	jz47xx_mac_configure();
 	for (i = 0; i <  NUM_TX_DESCS; i++) {
 		synopGMAC_tx_desc_init_ring(tx_desc + i, i == (NUM_TX_DESCS - 1));
@@ -486,7 +486,7 @@ int jz_net_initialize(bd_t *bis)
 		return -1;
 	}
 */
-	clk_set_rate(MACPHY, 50000000);
+	// clk_set_rate(MACPHY, 50000000);
 
 	gmacdev = &_gmacdev;
 

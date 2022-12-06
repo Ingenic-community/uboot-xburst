@@ -28,8 +28,8 @@
 
 /* Tab is 8 spaces! */
 
-#ifndef __CONFIG_X1501_PICO_H__
-#define __CONFIG_X1501_PICO_H__
+#ifndef __CONFIG_LOSHARK_V2_H__
+#define __CONFIG_LOSHARK_V2_H__
 
 /**
  * Basic configuration(SOC, Cache, UART, DDR).
@@ -40,7 +40,7 @@
 #define CONFIG_X1000
 
 
-#define CONFIG_SYS_APLL_FREQ			1008000000
+#define CONFIG_SYS_APLL_FREQ			1296000000
 #define CONFIG_SYS_MPLL_FREQ			600000000
 #define CONFIG_CPU_SEL_PLL			APLL
 #define CONFIG_DDR_SEL_PLL			MPLL
@@ -88,8 +88,8 @@
 /*
  * Reimu: Expected partition layout:
  * 0x000000 - 0x019fff (104 KiB)   uboot
- * 0x01a000 - 0x119fff (1 MiB)     kernel
- * 0x11a000 - 0x1fffff (920 KiB)   rootfs
+ * 0x01a000 - 0x0fffff (920 KiB)   kernel
+ * 0x100000 - 0x1fffff (1 MiB)     rootfs
  *
  * You must enable 'erase all' and flash all partitions at once in the cloner software.
 */
@@ -100,7 +100,7 @@
  */
 #define CONFIG_DDR_8M			8
 
-#define BOOTARGS_COMMON "console=ttyS2,115200n8 mem=8M@0x0 loglevel=7 ingenic_pm_clk=0 "
+#define BOOTARGS_COMMON "console=ttyS2,115200n8 mem=8M@0x0 loglevel=7 "
 #define	CONFIG_BOOTARGS BOOTARGS_COMMON "devtmpfs.mount=1 init=/linuxrc rootfstype=squashfs root=/dev/mtdblock2 ro"
 #define CONFIG_BOOTCOMMAND "sfcnor read 0x01a000 0x100000 0x80000000 ;bootm 0x80000000"
 
@@ -240,4 +240,4 @@
 #endif
 
 
-#endif /* __CONFIG_X1501_PICO_H__ */
+#endif /* __CONFIG_LOSHARK_V2_H__ */
