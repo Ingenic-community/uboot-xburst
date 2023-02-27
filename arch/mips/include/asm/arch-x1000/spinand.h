@@ -55,7 +55,7 @@ struct jz_sfcnand_partition_param {
 };
 
 struct device_id_struct {
-	uint8_t id_device;
+	uint16_t id_device;
 	char *name;
 	struct jz_sfcnand_base_param *param;
 };
@@ -106,7 +106,7 @@ struct jz_sfcnand_device {
 
 struct jz_sfcnand_flashinfo {
 	uint8_t id_manufactory;
-	uint8_t id_device;
+	uint16_t id_device;
 
 	struct jz_sfcnand_base_param param;
 	struct jz_sfcnand_partition_param partition;

@@ -583,12 +583,12 @@ static int32_t jz_sfc_nand_try_id(struct sfc_flash *flash, struct jz_sfcnand_fla
 	struct jz_sfcnand_device *nand_device;
 	struct sfc_transfer transfer;
 	uint8_t addr_len[2] = {0, 1};
-	uint8_t id_buf[2] = {0};
+	uint8_t id_buf[3] = {0};
 	uint8_t i = 0;
 
 	for(i = 0; i < sizeof(addr_len); i++) {
 
-		memset(id_buf, 0, 2);
+		memset(id_buf, 0, 3);
 		memset(&transfer, 0, sizeof(transfer));
 		sfc_list_init(&transfer);
 		transfer.sfc_mode = TM_STD_SPI;
@@ -614,7 +614,10 @@ static int32_t jz_sfc_nand_try_id(struct sfc_flash *flash, struct jz_sfcnand_fla
 		list_for_each_entry(nand_device, &nand_list, list) {
 			if(nand_device->id_manufactory == id_buf[0]) {
 				nand_info->id_manufactory = id_buf[0];
-				nand_info->id_device = id_buf[1];
+				/* ######## */
+				nand_info->id_device = id_buf[1] << 8;
+				nand_info->id_device |= id_buf[2];
+				/* ######## */
 				break;
 			}
 		}
@@ -639,12 +642,12 @@ static int32_t jz_sfc_nand_try_id(struct sfc_flash *flash, struct jz_sfcnand_fla
 			device_id++;
 		}
 		if(id_count < 0) {
-			printf("ERROR: do support this device, id_manufactory = 0x%02x, id_device = 0x%02x\n", nand_info->id_manufactory, nand_info->id_device);
+			printf("ERROR: do support this device, id_manufactory = 0x%02x, id_device = 0x%04x\n", nand_info->id_manufactory, nand_info->id_device);
 			return -ENODEV;
 		}
 	}
 
-	printf("Found nand: id_manufactory: 0x%02x id_device: 0x%02x\n", nand_info->id_manufactory, nand_info->id_device);
+	printf("Found nand: id_manufactory: 0x%02x id_device: 0x%04x\n", nand_info->id_manufactory, nand_info->id_device);
 
 	return jz_sfcnand_fill_ops(flash, &nand_device->ops);
 }
